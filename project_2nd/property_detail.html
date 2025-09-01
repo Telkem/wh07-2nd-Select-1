@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>매물 상세 정보</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f6f6f6;
+      /* body의 높이를 100vh로 설정하여 전체 화면을 차지하도록 변경 */
+      height: 100vh;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 16px 40px;
+      background-color: white;
+      border-bottom: 1px solid #ddd;
+    }
+    .header img {
+      width: 50px;
+      margin-right: 10px;
+    }
+    .header h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+    .container {
+      display: flex;
+      /* 헤더 높이를 뺀 나머지 높이로 설정 */
+      height: calc(100vh - 80px);
+    }
+    .sidebar {
+      width: 25%;
+      background-color: #f9f9f9;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      /* 사이드바에 스크롤 추가 */
+      overflow-y: auto;
+    }
+    .category-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    .category-buttons button {
+      flex: 1;
+      padding: 10px;
+      font-weight: bold;
+      background-color: #fde4de;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .card {
+      background-color: white;
+      border-radius: 5px;
+      padding: 30px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .card h3 {
+      font-size: 14px;
+      margin: 0 0 10px;
+    }
+
+    .card p {
+      font-size: 12px;
+      color: #444;
+      margin: 4px 0;
+    }
+    
+    .details {
+      width: 75%;
+      padding: 30px;
+      background-color: white;
+      border-left: 1px solid #ccc;
+      /* details 영역에 스크롤 추가 */
+      overflow-y: auto;
+    }
+    .details h2 {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    .details .price {
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .image-box {
+      width: 100%;
+      height: 500px;
+      background-color: #f2f2f2;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .house-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .info {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .map {
+      width: 100%;
+      height: 500px;
+    }
+    .button-row {
+      margin-top: 20px;
+    }
+    .button-row button {
+      padding: 10px 20px;
+      background-color: #dcdcdc;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    .button-row button:hover {
+      background-color: #bbb;
+    }
+    .btn-top {
+      float: right;
+      background-color: #f0f0f0;
+      font-size: 12px;
+      padding: 5px 12px;
+    }
+
+    .image-box {
+      width: 800px;
+      height: 500px;
+      background-color: #f2f2f2;
+      margin: 0 auto 20px auto; /* 위 0, 좌우 auto, 아래 20px 마진 */
+      border-radius: 5px;
+      /* 슬라이드 기능 구현 */
+      position: relative;
+      overflow: hidden; 
+
+    }
+    .image-slider {
+      display: flex; /* 이미지를 가로로 나열 */
+      height: 100%;
+      transition: transform 0.5s ease-in-out; /* 슬라이드 애니메이션 효과 */
+    }
+    .image-slider .house-img {
+      min-width: 100%; /* 각 이미지가 부모 컨테이너 너비를 꽉 채우도록 */
+      height: 100%;
+      object-fit: contain; /* 이 부분을 contain으로 변경 */
+      background-color: #f0f0f0; /* 여백이 생길 경우 배경색 지정 (선택 사항) */
+    }
+    .slider-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .slider-btn.left {
+      left: 10px;
+    }
+    .slider-btn.right {
+      right: 10px;
+    }
+
+    /* 사진 번호 스타일 추가 */
+    .image-counter {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <!-- 헤더 -->
+  <div class="header">
+    <img src="./img/bangu.png" alt="로고">
+    <h1>방구</h1>
+  </div>
+
+  <!-- 본문 -->
+  <div class="container">
+    <!-- 사이드바 -->
+    <div class="sidebar">
+      <div class="category-buttons">
+        <button>종합</button>
+        <button>가격</button>
+        <button>치안</button>
+        <button>거리</button>
+      </div>
+
+      <!-- 예시 카드 1 -->
+      <div class="card"  onclick="location.href='property_detail.html?item_index=0'" style="cursor:pointer;">
+        <h3>매물 1 : {{items[0].property_address}}</h3>
+        {% if items[0].rent == 0 %}
+        <p>매물정보: 전세 / 보증금 {{ items[0].deposit | money }}</p>
+        {% else %}
+        <p>매물정보: 월세 / {{items[0].rent | money}} / 보증금 {{ items[0].deposit | money }}</p>
+        {% endif %}
+      </div>
+      <!-- 예시 카드 2 -->
+      <div class="card" onclick="location.href='property_detail.html?item_index=1'" style="cursor:pointer;">
+        <h3>매물 2 : {{items[1].property_address}}</h3>
+        {% if items[1].rent == 0 %}
+        <p>매물정보: 전세 / 보증금 {{ items[1].deposit | money }}</p>
+        {% else %}
+        <p>매물정보: 월세 / {{items[1].rent | money}} / 보증금 {{ items[1].deposit | money }}</p>
+        {% endif %}
+      </div>
+      <div class="card" onclick="location.href='property_detail.html?item_index=2'" style="cursor:pointer;">
+        <h3>매물 3 : {{items[2].property_address}}</h3>
+        {% if items[2].rent == 0 %}
+        <p>매물정보: 전세 / 보증금 {{ items[2].deposit | money }}</p>
+        {% else %}
+        <p>매물정보: 월세 / {{items[2].rent | money}} / 보증금 {{ items[2].deposit | money }}</p>
+        {% endif %}
+      </div>
+      <div class="card" onclick="location.href='property_detail.html?item_index=3'" style="cursor:pointer;">
+        <h3>매물 4 : {{items[3].property_address}}</h3>
+        {% if items[3].rent == 0 %}
+        <p>매물정보: 전세 / 보증금 {{ items[3].deposit | money }}</p>
+        {% else %}
+        <p>매물정보: 월세 / {{items[3].rent | money}} / 보증금 {{ items[3].deposit | money }}</p>
+        {% endif %}
+      </div>
+      <div class="card"  onclick="location.href='property_detail.html?item_index=4'" style="cursor:pointer;">
+        <h3>매물 5 : {{items[4].property_address}}</h3>
+        {% if items[4].rent == 0 %}
+        <p>매물정보: 전세 / 보증금 {{ items[4].deposit | money }}</p>
+        {% else %}
+        <p>매물정보: 월세 / {{items[4].rent | money}} / 보증금 {{ items[4].deposit | money }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- 상세 정보 -->
+    <div class="details">
+      <h2>매물 1</h2>
+      <div class="price">월세 60만원, 보증금 500만원</div>
+
+      <button class="btn-top" onclick="location.href='agent_detail.html'">공인중개사 정보 더보기</button>
+
+      <div class="info">
+        <strong>매물 주소:</strong> <span>서울특별시 용산구 한남동 732-171</span>
+      </div>
+
+      <div class="image-box">
+        <div class="image-slider">
+          {% for img in imgs %}
+            <img src="room_img/{{img.image_path.split('/')[-1]}}" alt="매물 사진" class="house-img">
+          {% endfor %}
+        </div>
+        <button class="slider-btn left">&#x25C0;</button>
+        <button class="slider-btn right">&#x25B6;</button>
+        <!-- 사진 번호를 표시할 div 추가 -->
+        <div class="image-counter">1 / 1</div>
+      </div>
+      <div class="map" id="map"></div>
+
+<!-- 지도 JS 추가 -->
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=306c594bc70125ed78c30c9e79de0019"></script>
+<script>
+  const items = {{ items | tojson }};
+  const urlParams = new URLSearchParams(window.location.search);
+  const itemIndex = urlParams.get('item_index');
+  
+ if (itemIndex !== null && items[itemIndex]) {
+    const selectedItem = items[itemIndex];
+    function formatMoney(value) {
+      if (value >= 100000000) {
+        // 1억 이상일 경우
+        const billion = Math.floor(value / 100000000);
+        const million = Math.floor((value % 100000000) / 10000);
+        return `${billion}억 ${million > 0 ? million + '만원' : ''}`.trim();
+      } else if (value >= 10000) {
+        // 만원 이상일 경우
+        return `${Math.floor(value / 10000)}만원`;
+      } else {
+        // 만원 미만일 경우
+        return `${value}원`;
+      }
+    }
+
+    const formattedRent = formatMoney(selectedItem.rent);
+    const formattedDeposit = formatMoney(selectedItem.deposit);
+
+    document.querySelector('.details h2').textContent = `매물 ${parseInt(itemIndex, 10) + 1}`;
+     if (selectedItem.rent === 0) {
+      document.querySelector('.price').textContent = `전세 ${formattedDeposit}`;
+    } else {
+      document.querySelector('.price').textContent = `월세 ${formattedRent}, 보증금 ${formattedDeposit}`;
+    }
+    document.querySelector('.info span').textContent = `${selectedItem.property_address}`;
+  
+    const mapContainer = document.getElementById('map');
+    const mapOption = {
+      center: new kakao.maps.LatLng(items[itemIndex].latitude, items[itemIndex].longitude),
+      level: 3
+    };
+    const map = new kakao.maps.Map(mapContainer, mapOption);
+    const markerPosition = new kakao.maps.LatLng(items[itemIndex].latitude, items[itemIndex].longitude);
+    const marker = new kakao.maps.Marker({
+      position: markerPosition
+    });
+    marker.setMap(map);
+
+
+    const slider = document.querySelector('.image-slider');
+    const images = document.querySelectorAll('.image-slider .house-img');
+    const leftBtn = document.querySelector('.slider-btn.left');
+    const rightBtn = document.querySelector('.slider-btn.right');
+    const counter = document.querySelector('.image-counter'); // 카운터 요소 가져오기
+
+    let currentIndex = 0;
+    const totalImages = images.length;
+
+    function updateSlider() {
+      slider.style.transform = `translateX(${-currentIndex * 100}%)`;
+      // 사진 번호 업데이트
+      counter.textContent = `${currentIndex + 1} / ${totalImages}`;
+    }
+
+    leftBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateSlider();
+      }
+    });
+
+    rightBtn.addEventListener('click', () => {
+      if (currentIndex < totalImages - 1) {
+        currentIndex++;
+        updateSlider();
+      }
+    });
+
+    // 페이지 로드 시 첫 번째 사진만 보이도록 설정
+    updateSlider();
+  }
+</script>
+

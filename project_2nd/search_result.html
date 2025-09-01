@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>검색 결과</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f6f6f6;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 16px 40px;
+      background-color: white;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .header img {
+      width: 50px;
+      margin-right: 10px;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+
+    .content {
+      display: flex;
+      height: calc(100vh - 80px);
+    }
+
+    .sidebar {
+      width: 25%;
+      background-color: #f9f9f9;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .category-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .category-buttons button {
+      flex: 1;
+      padding: 10px;
+      font-weight: bold;
+      background-color: #fde4de;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 5px;
+      padding: 30px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .card h3 {
+      font-size: 14px;
+      margin: 0 0 10px;
+    }
+
+    .card p {
+      font-size: 12px;
+      color: #444;
+      margin: 4px 0;
+    }
+
+    #map {
+      width: 75%;
+      height: 100%;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+    }
+
+    .footer button {
+      padding: 10px 20px;
+      background-color: #dcdcdc;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .footer button:hover {
+      background-color: #bbb;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <div class="header">
+    <img src="./img/bangu.png" alt="방구 로고" />
+    <h1>방구</h1>
+  </div>
+
+  <!-- 본문 -->
+  <div class="content">
+    
+    <!-- 좌측: 필터 + 카드 -->
+    <div class="sidebar">
+      <div class="category-buttons">
+        <button>종합</button>
+        <button>가격</button>
+        <button>치안</button>
+        <button>거리</button>
+      </div>
+
+      <!-- 예시 카드 -->
+      <div class="card"  onclick="location.href='property_detail.html?item_index=0'" style="cursor:pointer;">
+        <h3>매물 1 : {{items[0].property_address}}</h3>
+        {% if items[0].rent == 0 %}
+        <p>매물정보: 전세 / 보증금 {{ items[0].deposit | money }}</p>
+        {% else %}
+        <p>매물정보: 월세 / {{items[0].rent | money}} / 보증금 {{ items[0].deposit | money }}</p>
+        {% endif %}
+      </div>
+
+      <div class="card" onclick="location.href='property_detail.html?item_index=1'" style="cursor:pointer;">
+        <h3>매물 2 : {{items[1].property_address}}</h3>
+        {% if items[1].rent == 0 %}
+        <p>매물정보: 전세 / 보증금 {{ items[1].deposit | money }}</p>
+        {% else %}
+        <p>매물정보: 월세 / {{items[1].rent | money}} / 보증금 {{ items[1].deposit | money }}</p>
+        {% endif %}
+      </div>
+
+      <div class="card" onclick="location.href='property_detail.html?item_index=2'" style="cursor:pointer;">
+        <h3>매물 3 : {{items[2].property_address}}</h3>
+        {% if items[2].rent == 0 %}
+        <p>매물정보: 전세 / 보증금 {{ items[2].deposit | money }}</p>
+        {% else %}
+        <p>매물정보: 월세 / {{items[2].rent | money}} / 보증금 {{ items[2].deposit | money }}</p>
+        {% endif %}
+      </div>
+
+      <div class="card" onclick="location.href='property_detail.html?item_index=3'" style="cursor:pointer;">
+        <h3>매물 4 : {{items[3].property_address}}</h3>
+        {% if items[3].rent == 0 %}
+        <p>매물정보: 전세 / 보증금 {{ items[3].deposit | money }}</p>
+        {% else %}
+        <p>매물정보: 월세 / {{items[3].rent | money}} / 보증금 {{ items[3].deposit | money }}</p>
+        {% endif %}
+      </div>
+
+      <div class="card"  onclick="location.href='property_detail.html?item_index=4'" style="cursor:pointer;">
+        <h3>매물 5 : {{items[4].property_address}}</h3>
+        {% if items[4].rent == 0 %}
+        <p>매물정보: 전세 / 보증금 {{ items[4].deposit | money }}</p>
+        {% else %}
+        <p>매물정보: 월세 / {{items[4].rent | money}} / 보증금 {{ items[4].deposit | money }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- 우측: 지도 -->
+    <div id="map"></div>
+  </div>
+
+  <!-- 하단 이전 버튼 -->
+  <div class="footer">
+    <button onclick="history.back()">이전</button>
+  </div>
+
+  <!-- 카카오맵 스크립트 -->
+  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=306c594bc70125ed78c30c9e79de0019"></script>
+  <script>
+    const items = {{ items | tojson }};
+    const mapContainer = document.getElementById('map');
+    const mapOption = {
+      center: new kakao.maps.LatLng(items[0].latitude, items[0].longitude),
+      level: 4
+    };
+    const map = new kakao.maps.Map(mapContainer, mapOption);
+
+    const positions = [
+      {
+        title: items[0].property_address,
+        latlng: new kakao.maps.LatLng(items[0].latitude, items[0].longitude)
+      },
+      {
+        title: items[3].property_address,
+        latlng: new kakao.maps.LatLng(items[1].latitude, items[1].longitude)
+      },
+      {
+        title: items[3].property_address,
+        latlng: new kakao.maps.LatLng(items[2].latitude, items[2].longitude)
+      },
+      {
+        title: items[3].property_address,
+        latlng: new kakao.maps.LatLng(items[3].latitude, items[3].longitude)
+      },
+      {
+        title: items[4].property_address,
+        latlng: new kakao.maps.LatLng(items[4].latitude, items[4].longitude)
+      }
+    ];
+
+    positions.forEach(pos => {
+      new kakao.maps.Marker({
+        map: map,
+        position: pos.latlng,
+        title: pos.title
+      });
+    });
+  </script>
+</body>
+</html>

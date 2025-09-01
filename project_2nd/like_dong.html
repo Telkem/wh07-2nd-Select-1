@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동네 검색</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-left: 40px;
+            border-bottom: 1px solid #eee;
+            position: fixed;
+            background-color: #fff;
+            top: 0;
+            left: 0;
+        }
+        .header img {
+            width: 100px;
+            margin-right: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding-top: 150px;
+            padding-bottom: 50px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        .search-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        h2 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .input-group input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .input-group button {
+            padding: 12px 20px;
+            background-color: #fde4de;
+            border: none;
+            border-radius: 5px;
+            color: #333;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .input-group button:hover {
+            background-color: #f8d2cc;
+        }
+        .results-section {
+            margin-top: 30px;
+        }
+        .results-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        .results-list li {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .results-list li:last-child {
+            border-bottom: none;
+        }
+        .results-list li.selected {
+            background-color: #ffe8e8;
+            font-weight: bold;
+        }
+        .no-results {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        .action-buttons button {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons .btn-prev {
+            background-color: #cccccc;
+            color: #000;
+        }
+        .action-buttons .btn-prev:hover {
+            background-color: #b0b0b0;
+        }
+        .action-buttons .btn-done {
+            background-color: #fde4de;
+            color: #000;
+        }
+        .action-buttons .btn-done:hover {
+            background-color: #f8d2cc;
+        }
+        @media (max-width: 768px) {
+            .header {
+                margin-left: 0;
+                justify-content: center;
+            }
+            .container {
+                padding-top: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="./img/bangu.png" alt="마스코트 캐릭터">
+        <h1>방구</h1>
+    </div>
+    <div class="container">
+        <div class="search-section">
+            <h2>동네 입력</h2>
+            <div class="input-group">
+                <input type="text" id="addressInput" placeholder="지역 검색">
+                <button type="button" id="searchBtn">검색</button>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <ul id="resultsList" class="results-list">
+                </ul>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-prev" onclick="history.back()">이전</button>
+            <button class="btn-done" id="doneBtn">완료</button>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=306c594bc70125ed78c30c9e79de0019&libraries=services"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var geocoder = new kakao.maps.services.Geocoder();
+
+            var addressInput = document.getElementById('addressInput');
+            var searchBtn = document.getElementById('searchBtn');
+            var resultsList = document.getElementById('resultsList');
+            var doneBtn = document.getElementById('doneBtn');
+
+            function displayRegions(regions) {
+                resultsList.innerHTML = '';
+                if (regions.length === 0) {
+                    resultsList.innerHTML = '<li class="no-results">검색 결과가 없습니다.</li>';
+                    doneBtn.disabled = true;
+                    return;
+                }
+
+                regions.forEach(function(region) {
+                    var li = document.createElement('li');
+                    li.textContent = region;
+                    li.dataset.regionName = region;
+                    
+                    li.addEventListener('click', function() {
+                        document.querySelectorAll('.results-list li').forEach(el => {
+                            el.classList.remove('selected');
+                        });
+                        this.classList.add('selected');
+                        doneBtn.disabled = false;
+                        doneBtn.dataset.selectedRegion = this.dataset.regionName;
+                    });
+                    resultsList.appendChild(li);
+                });
+            }
+
+            searchBtn.addEventListener('click', function() {
+                var address = addressInput.value.trim();
+                if (!address) {
+                    alert('주소를 입력해주세요.');
+                    return;
+                }
+
+                geocoder.addressSearch(address, function(result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        var promises = result.map(item => {
+                            return new Promise(resolve => {
+                                geocoder.coord2RegionCode(item.x, item.y, (regionResult, regionStatus) => {
+                                    if (regionStatus === kakao.maps.services.Status.OK) {
+                                        var adminRegion = regionResult.find(r => r.region_type === 'H');
+                                        resolve(adminRegion ? adminRegion.address_name : null);
+                                    } else {
+                                        resolve(null);
+                                    }
+                                });
+                            });
+                        });
+
+                        Promise.all(promises).then(regions => {
+                            var uniqueRegions = Array.from(new Set(regions.filter(r => r)));
+                            displayRegions(uniqueRegions);
+                        });
+
+                    } else {
+                        displayRegions([]);
+                    }
+                });
+            });
+
+            doneBtn.addEventListener('click', function() {
+                var selectedRegion = this.dataset.selectedRegion;
+                if (selectedRegion) {
+                    alert('선택된 동네: ' + selectedRegion);
+                    window.location.href = 'filter1.html';
+                } else {
+                    alert('동네를 선택해주세요.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

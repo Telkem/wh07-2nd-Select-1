@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>회원가입</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background-color: #fff;
+      margin-top: 50px;
+      padding-top: 50px;
+    }
+
+    .header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      margin-left: 40px;
+      border-bottom: 1px solid #eee;
+      position: fixed;
+      background-color: #fff;
+    }
+
+    .header img {
+      width: 100px;
+      margin-right: 20px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      margin: 0;
+      color: #333;
+    }
+
+    .signup-form {
+      padding: 30px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin-top: 50px;
+    }
+
+    .container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+      font-size: 28px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="password"],
+    .form-group select {
+      width: calc(100% - 20px);
+      padding: 12px 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .form-group select {
+      background-color: #fff;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2C114.7L154%2C247.7c-5.6%2C5.6-14.4%2C5.6-20%2C0L5%2C114.7C-1.7%2C107.4-1.7%2C95.6%2C5%2C88.4c6.8-6.8%2C17.6-6.8%2C24.4%2C0l124.6%2C124.6l124.6-124.6c6.8-6.8%2C17.6-6.8%2C24.4%2C0C293.7%2C95.6%2C293.7%2C107.4%2C287%2C114.7z%22%2F%3E%3C%2Fsvg%3E');
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 12px;
+    }
+
+    .btn-signup {
+      width: 100%;
+      padding: 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-signup:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-back-outside {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background-color: #f0f0f0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    /* Custom Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .close-btn {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="./img/bangu.png" alt="로고" />
+    <h1>방구</h1>
+  </div>
+  <div class="container">
+    <h2>회원가입</h2>
+    <form id="signupForm" class="signup-form">
+      <div class="form-group">
+        <label for="id">아이디</label>
+        <input type="text" id="id" name="id" placeholder="아이디 입력" required />
+      </div>
+      <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" name="password" placeholder="비밀번호 입력" required />
+      </div>
+      <div class="form-group">
+        <label for="nickname">닉네임</label>
+        <input type="text" id="nickname" name="nickname" placeholder="닉네임 입력" required />
+      </div>
+      <div class="form-group">
+        <label for="birth">생년월일</label>
+        <input type="text" id="birth" name="birth" placeholder="생년월일 선택" required />
+      </div>
+      <div class="form-group">
+        <label for="gender">성별</label>
+        <select id="gender" name="gender" required>
+          <option value="">성별 선택</option>
+          <option value="male">남성</option>
+          <option value="female">여성</option>
+          <option value="other">선택 안 함</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-signup">회원가입</button>
+    </form>
+    <!-- 🔻 폼 밖 이전 버튼 -->
+    <button type="button" class="btn-back-outside" onclick="history.back()">이전</button>
+  </div>
+  
+  <!-- Custom Modal -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <p id="modalMessage"></p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
+  <script>
+    // 날짜 선택기 초기화
+    flatpickr("#birth", {
+      locale: "ko",
+      dateFormat: "Y-m-d",
+      altInput: true,
+      altFormat: "Y년 m월 d일",
+    });
+
+    // 모달을 표시하는 함수
+    function showModal(message, callback) {
+      const modal = document.getElementById("myModal");
+      const modalMessage = document.getElementById("modalMessage");
+      modalMessage.textContent = message;
+      modal.style.display = "flex";
+      // 모달 닫기 버튼에 콜백 함수 추가
+      const closeBtn = document.querySelector(".close-btn");
+      closeBtn.onclick = () => {
+        closeModal();
+        if (callback) {
+          callback();
+        }
+      };
+    }
+
+    // 모달을 닫는 함수
+    function closeModal() {
+      const modal = document.getElementById("myModal");
+      modal.style.display = "none";
+    }
+
+    // 폼 제출 이벤트 리스너
+    document.getElementById("signupForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const data = {
+        username: document.getElementById("id").value,
+        password: document.getElementById("password").value,
+        nickname: document.getElementById("nickname").value,
+        birth: document.getElementById("birth").value,
+        gender: document.getElementById("gender").value
+      };
+
+      try {
+        let res = await fetch("http://192.168.14.40:8000/signup", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(data)
+        });
+        
+        let result = await res.json();
+        
+        // 회원가입 성공 시 모달을 띄우고 로그인 페이지로 이동
+        if (res.ok) { // HTTP 상태 코드가 200-299 범위인 경우
+          showModal("회원가입 성공!", () => {
+            // 로그인 페이지로 이동
+            window.location.href = 'login.html'; 
+          });
+        } else {
+          showModal(result.message || result.error);
+        }
+
+      } catch (error) {
+        console.error("Error during signup:", error);
+        showModal("회원가입 중 네트워크 오류가 발생했습니다.");
+      }
+    });
+  </script>
+</body>
+</html>
